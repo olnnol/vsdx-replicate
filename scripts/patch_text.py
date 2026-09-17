@@ -1,13 +1,23 @@
 # -*- coding: utf-8 -*-
 """Pass 2: rewrite Character sections + Text elements inside the saved vsdx
-with exact per-run formatting (font, size, style, pos, color)."""
-import json, os, re, shutil, zipfile
+with exact per-run formatting (font, size, style, pos, color).
+
+Usage: python patch_text.py [vsdx_path] [text_runs.json]
+       (defaults: <script_dir>/out/output.vsdx + <script_dir>/out/text_runs.json;
+        relative paths resolve against the current working directory.)"""
+import json, os, re, shutil, sys, zipfile
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-VSDX = os.path.join(BASE, 'out', 'output.vsdx')
-RUNS = json.load(open(os.path.join(BASE, 'out', 'text_runs.json'), encoding='utf-8'))
+VSDX = sys.argv[1] if len(sys.argv) > 1 else os.path.join(BASE, 'out', 'output.vsdx')
+RUNS_PATH = sys.argv[2] if len(sys.argv) > 2 else os.path.join(BASE, 'out', 'text_runs.json')
+RUNS = json.load(open(RUNS_PATH, encoding='utf-8'))
 
-FONTS = {'S': 'SimSun', 'T': 'Times New Roman'}
+FONTS = {'S': 'SimSun', 'T': 'Times New Roman', 'A': 'Arial', 'G': 'Century Gothic'}
+
+def font_name(key):
+    """Map short font keys to font names; unknown keys pass through literally
+    (e.g. f='Arial' uses Arial directly)."""
+    return FONTS.get(key, key)
 
 def esc(t):
     return t.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
@@ -48,7 +58,7 @@ def build_shape_xml(lines):
         style = b | (it << 1)
         color = f"#{col}" if col else None
         cells = [
-            ('Font', FONTS[f], None),
+            ('Font', font_name(f), None),
             ('Color', color, None),
             ('Style', str(style), None),
             ('Case', '0', None),

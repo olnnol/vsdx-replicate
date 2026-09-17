@@ -6,4 +6,6 @@ crops/
 *.pdf
 *.png
 !docs/*.png
+!examples/**/*.png
+!examples/**/*.vsdx
 .DS_Store
