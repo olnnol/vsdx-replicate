@@ -97,23 +97,27 @@ GREEN = [
     (916, 640, 'Subtelomeric', 'Filtering'),
     (1796, 640, 'Probe Identification', 'and Demultiplexing'),
 ]
+DYS = {1: 0, 2: -2, 3: 5, 4: 0, 5: -1}
+SZS = {1: 60, 2: 61, 3: 61, 4: 61, 5: 61}
 for i, (x, y, l1, l2) in enumerate(GREEN):
-    s = rect(x, y, 724, 204, C['green'], r=60, name=f'STEP{i+1}')
-    put_text(s, [[G(l1, 60, col='FFFFFF')], [G(l2, 60, col='FFFFFF')]],
-             tw=724, th=204)
+    n = i + 1
+    sz = SZS[n]
+    s = rect(x, y, 724, 204, C['green'], r=66, name=f'STEP{n}')
+    put_text(s, [[G(l1, sz, col='FFFFFF')], [G(l2, sz, col='FFFFFF')]],
+             tw=724, th=204, dy=DYS[n])
 
 # ================================================================ diamonds
 d1 = poly([(439, 258), (764, 421), (439, 584), (114, 421)], fill=C['magenta'])
 d1.Name = 'DIAM1'
-put_text(d1, [[G('Basecalled Data', 60, col='FFFFFF')]], tw=500, th=326)
+put_text(d1, [[G('Basecalled Data', 61, col='FFFFFF')]], tw=500, th=326, dy=-2)
 d2 = poly([(372, 979), (697, 1142), (372, 1305), (47, 1142)], fill=C['blue'])
 d2.Name = 'DIAM2'
-put_text(d2, [[G('Analysis and', 60, col='231F20')], [G('Output', 60, col='231F20')]],
+put_text(d2, [[G('Analysis and', 61, col='231F20')], [G('Output', 61, col='231F20')]],
          tw=500, th=326, dy=13)
 
 # ================================================================ optional box
-y1 = rect(1525, 10, 354, 172, C['yellow'], r=60, name='OPTIONAL')
-put_text(y1, [[G('Basecalling', 60, col='231F20')], [G('(Optional)', 60, col='231F20')]],
+y1 = rect(1525, 10, 354, 172, C['yellow'], r=66, name='OPTIONAL')
+put_text(y1, [[G('Basecalling', 61, col='231F20')], [G('(Optional)', 61, col='231F20')]],
          tw=354, th=172)
 
 # ================================================================ solid wedges
@@ -141,18 +145,11 @@ arr = []
 for x, y in pts: arr += [x/IN, (H-y)/IN]
 arc = page.DrawPolyline(arr, 0)
 arc.Cells('LineColor').FormulaU = hx(C['dark'])
-arc.Cells('LineWeight').FormulaU = f'{8*MM:g} mm'
+arc.Cells('LineWeight').FormulaU = f'{6.5*MM:g} mm'
 arc.Cells('LineCap').FormulaU = '1'
 arc.Name = 'CURVE'
-# stealth head at arc end, tangent (-0.425, 0.905)
-tip = (1278, 280)
-dx, dy = -0.425, 0.905
-px_, py_ = -dy, dx
-L, Hw, notch = 44, 21, 33
-b1 = (tip[0] - L*dx + Hw*px_, tip[1] - L*dy + Hw*py_)
-b2 = (tip[0] - L*dx - Hw*px_, tip[1] - L*dy - Hw*py_)
-nt = (tip[0] - notch*dx, tip[1] - notch*dy)
-poly([tip, b1, nt, b2], fill=C['dark'])
+# stealth head, outline fitted from the source bitmap: tip / barbL / notch / barbR
+poly([(1278, 281), (1259, 233), (1285, 247), (1306, 238)], fill=C['dark'])
 
 # straight up arrow below the optional box
 s = page.DrawLine(ix(1705.5), iy(337), ix(1705.5), iy(210))
@@ -161,7 +158,7 @@ s.Cells('LineWeight').FormulaU = f'{5*MM:g} mm'
 poly([(1705.5, 198), (1680.5, 243), (1705.5, 232), (1730.5, 243)], fill=C['dark'])
 
 # ================================================================ panel label
-ftext(45, 30, 90, 66, [[G('a', 104, b=1, col='231F20')]], align='l')
+ftext(51, 26, 90, 66, [[G('a', 100, b=1, col='231F20')]], align='l')
 
 # ================================================================ save
 doc.SaveAs(OUTV)

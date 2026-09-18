@@ -14,40 +14,45 @@
 
 ## 效果演示
 
-论文配图（位图输入）与 Visio 复刻渲染（.vsdx 导出 PDF）整页对比：
+经典 Transformer 架构图（位图输入）与 Visio 复刻渲染（.vsdx 导出 PDF）整页对比：
 
 ![before-after](docs/demo-before-after.png)
 
-细节特写（左 = 原图，右 = 复刻）—— 判断菱形、三角连接件、曲线箭头与可选分支、圆角步骤框、输出菱形：
+细节特写（左 = 原图，右 = 复刻）—— 编码器容器与虚线残差框、V/K/Q 分配支路、掩码注意力、位置编码图标：
 
 ![details](docs/demo-details.png)
 
-示例复刻产物共 **19 个形状**全部独立可选中/可编辑；分区像素对比整体 `px>60` 差异 3.4%（主要为字体渲染差异），文字行位/行距误差 ≤3px。可下载 [examples/tarpon-flowchart/replica.vsdx](examples/tarpon-flowchart/replica.vsdx) 用 Visio 打开验证。
+主示例复刻产物共 **140 个形状**全部独立可选中/可编辑；整体像素差 mean 8.4，`px>60` 占比 4.4%（主要为字体渲染差异），文字逐字形位置误差 1-2px。可下载 [examples/transformer-architecture/replica.vsdx](examples/transformer-architecture/replica.vsdx) 用 Visio 打开验证。
 
-> 示例图片：Deimler et al., "TARPON", *PLOS Computational Biology* (2026), Fig 1(a)，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。
+> 示例图片：dvgodoy 重绘版 Transformer 架构图（源自 "Attention Is All You Need", Vaswani et al. 2017），
+> [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Transformer,_full_architecture.png)，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。
+
+另附第二示例 [examples/tarpon-flowchart/](examples/tarpon-flowchart/)：PLOS Computational Biology 论文流程图
+（Deimler et al. 2026, CC BY 4.0），含判断菱形、曲线箭头、彩色圆角框等元素。
 
 ## 目录结构
 
 ```
 vsdx-replicate/
 ├── SKILL.md                    # 完整方法论与全部踩坑记录（Agent 技能入口）
-├── scripts/                    # 参考实现（对真实论文流程图跑通）
+├── scripts/                    # 参考实现（对真实图跑通）
 │   ├── extract.py              # Stage 1：调色板 + 色块 bbox 提取（近邻色并查集合并）
 │   ├── trace2.py               # 线网追踪：实线/虚线/箭头/跳线(hop)
 │   ├── render.py               # Stage 3：COM 渲染，几何 + 纯文本 + runs dump
-│   ├── patch_text.py           # Stage 4：vsdx OPC XML 富文本（[vsdx] [runs] 参数）
+│   ├── patch_text.py           # Stage 4：vsdx OPC XML 富文本（[vsdx] [runs] 参数，字间距）
 │   └── export_compare.py       # Stage 5：PDF 导出 → 栅格化 → 差异对比（--src/--vsdx）
 ├── examples/
-│   └── tarpon-flowchart/       # 完整示例：源图 + 复刻 vsdx + 场景脚本 + 复跑说明
+│   ├── transformer-architecture/   # 主示例：Transformer 架构图（CC BY 4.0）
+│   └── tarpon-flowchart/           # 第二示例：PLOS 论文流程图（CC BY 4.0）
 └── docs/                       # 效果对比图
 ```
 
-## 快速开始（以示例为例）
+## 快速开始（以主示例为例）
 
 ```bash
 pip install pywin32 opencv-python pillow pymupdf
 
-cd examples/tarpon-flowchart
+cd examples/transformer-architecture
 python render_example.py                                                  # 几何 + 纯文本
 python ../../scripts/patch_text.py out/replica.vsdx out/text_runs.json    # 富文本
 python ../../scripts/export_compare.py --src source.png --vsdx out/replica.vsdx
